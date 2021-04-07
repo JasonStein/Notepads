@@ -1,7 +1,8 @@
 ﻿<Application
     x:Class="Notepads.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -19,6 +20,7 @@
             </ResourceDictionary.ThemeDictionaries>-->
 
             <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary Source="Notepads.Controls/Themes/Generic.xaml" />
                 <ResourceDictionary Source="Controls/TextEditor/TextEditorCore.xaml" />
                 <ResourceDictionary Source="Controls/FindAndReplace/FindAndReplacePlaceholder.xaml"></ResourceDictionary>
@@ -29,9 +31,9 @@
                 <ResourceDictionary Source="Resource/CustomSliderStyle.xaml"></ResourceDictionary>
                 <ResourceDictionary Source="Resource/CustomRadioButtonStyle.xaml"></ResourceDictionary>
                 <ResourceDictionary Source="Resource/CustomToggleSwitchStyle.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="Resource/CustomNavigationViewItemStyle.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Resource/CustomNavigationViewStyle.xaml"></ResourceDictionary>
                 <ResourceDictionary Source="Resource/CustomAppBarButtonStyle.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="Resource/CustomCheckBoxStyle.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Resource/CustomFlyoutItemStyle.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="CompactSubtitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
@@ -42,6 +44,29 @@
                 <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumHighColor}"/>
             </Style>
 
+            <!-- TODO: Remove these styles -->
+            <Style TargetType="MenuFlyoutPresenter">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            <Style TargetType="FlyoutPresenter">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            <Style x:Key="ButtonRevealStyle" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            <Style TargetType="muxc:ColorPicker">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            <Style TargetType="ToolTip">
+                <Setter Property="CornerRadius" Value="0" />
+            </Style>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

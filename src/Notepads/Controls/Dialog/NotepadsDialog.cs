@@ -17,6 +17,12 @@
 
         public NotepadsDialog()
         {
+            // TODO: Uncomment to apply CornerRadius
+            //CornerRadius = (CornerRadius)Application.Current.Resources["OverlayCornerRadius"];
+            PrimaryButtonStyle = GetButtonStyle();
+            SecondaryButtonStyle = GetButtonStyle();
+            CloseButtonStyle = GetButtonStyle();
+
             RequestedTheme = ThemeSettingsService.ThemeMode;
             Background = ThemeSettingsService.ThemeMode == ElementTheme.Dark
                 ? _darkModeBackgroundBrush
@@ -34,9 +40,18 @@
 
         internal readonly ResourceLoader ResourceLoader = ResourceLoader.GetForCurrentView();
 
+        internal static Style GetButtonStyle()
+        {
+            var buttonStyle = new Style(typeof(Button));
+            // TODO: Uncomment to apply CornerRadius
+            //buttonStyle.Setters.Add(new Setter(Control.CornerRadiusProperty,
+            //    (CornerRadius)Application.Current.Resources["ControlCornerRadius"]));
+            return buttonStyle;
+        }
+
         internal static Style GetButtonStyle(Color backgroundColor)
         {
-            var buttonStyle = new Windows.UI.Xaml.Style(typeof(Button));
+            var buttonStyle = GetButtonStyle();
             buttonStyle.Setters.Add(new Setter(Control.BackgroundProperty, backgroundColor));
             buttonStyle.Setters.Add(new Setter(Control.ForegroundProperty, Colors.White));
             return buttonStyle;
