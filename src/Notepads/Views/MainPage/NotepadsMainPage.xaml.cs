@@ -39,7 +39,7 @@
         private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView();
 
         private bool _loaded = false;
-        private bool _appShouldExitAfterLastEditorClosed = false;
+        private bool _tabMovedToAnotherInstance = false;
 
         private INotepadsCore _notepadsCore;
 
@@ -372,10 +372,6 @@
                     {
                         if (await Save(textEditor, saveAs: false, ignoreUnmodifiedDocument: true, rebuildOpenRecentItems: false))
                         {
-                            if (count == 1)
-                            {
-                                _appShouldExitAfterLastEditorClosed = true;
-                            }
                             NotepadsCore.DeleteTextEditor(textEditor);
                             count--;
                         }
@@ -469,11 +465,23 @@
             }
         }
 
-        private void OnTextEditorUnloaded(object sender, ITextEditor textEditor)
+        private async void OnTextEditorUnloaded(object sender, ITextEditor textEditor)
         {
-            if (NotepadsCore.GetNumberOfOpenedTextEditors() == 0 && !_appShouldExitAfterLastEditorClosed)
+            if (NotepadsCore.GetNumberOfOpenedTextEditors() == 0)
             {
-                NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
+                if (_tabMovedToAnotherInstance && AppSettingsService.IsSessionSnapshotEnabled)
+                {
+                    await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
+                }
+
+                if (_tabMovedToAnotherInstance || AppSettingsService.ExitingLastTabClosesWindow 
+                    ? !await ApplicationView.GetForCurrentView().TryConsolidateAsync() : true)
+                {
+                    if (_tabMovedToAnotherInstance)
+                        Application.Current.Exit();
+                    else
+                        NotepadsCore.OpenNewTextEditor(_defaultNewFileName);
+                }
             }
         }
 
@@ -500,34 +508,18 @@
             NotificationCenter.Instance.PostNotification(_resourceLoader.GetString("TextEditor_NotificationMsg_FileSaved"), 1500);
         }
 
-        private async void OnTextEditorMovedToAnotherAppInstance(object sender, ITextEditor textEditor)
+        private void OnTextEditorMovedToAnotherAppInstance(object sender, ITextEditor textEditor)
         {
-            // Notepads should exit if last tab was dragged to another app instance
-            if (NotepadsCore.GetNumberOfOpenedTextEditors() == 1)
-            {
-                _appShouldExitAfterLastEditorClosed = true;
-
-                NotepadsCore.DeleteTextEditor(textEditor);
-
-                if (AppSettingsService.IsSessionSnapshotEnabled)
-                {
-                    await SessionManager.SaveSessionAsync(() => { SessionManager.IsBackupEnabled = false; });
-                }
-
-                Application.Current.Exit();
-            }
-            else
-            {
-                NotepadsCore.DeleteTextEditor(textEditor);
-            }
+            _tabMovedToAnotherInstance = true;
+            NotepadsCore.DeleteTextEditor(textEditor);
         }
 
         private async void OnTextEditorClosing(object sender, ITextEditor textEditor)
         {
-            if (NotepadsCore.GetNumberOfOpenedTextEditors() == 1 && textEditor.IsModified == false && textEditor.EditingFile == null)
+            if (!AppSettingsService.ExitingLastTabClosesWindow && NotepadsCore.GetNumberOfOpenedTextEditors() == 1 && textEditor.IsModified == false && textEditor.EditingFile == null)
             {
-                // Do nothing
-                // Take no action if user is trying to close the last tab and the last tab is a new empty document
+                // Do nothing if user doesn't want closing window when last tab closed
+                // And if user is trying to close the last tab and the last tab is a new empty document
             }
             else if (!textEditor.IsModified)
             {

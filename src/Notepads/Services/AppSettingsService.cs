@@ -247,6 +247,18 @@
             }
         }
 
+        private static bool _exitingLastTabClosesWindow;
+
+        public static bool ExitingLastTabClosesWindow
+        {
+            get => _exitingLastTabClosesWindow;
+            set
+            {
+                _exitingLastTabClosesWindow = value;
+                ApplicationSettingsStore.Write(SettingsKey.ExitingLastTabClosesWindowBool, value);
+            }
+        }
+
         private static bool _alwaysOpenNewWindow;
 
         public static bool AlwaysOpenNewWindow
@@ -311,6 +323,8 @@
             InitializeSessionSnapshotSettings();
 
             InitializeAppOpeningPreferencesSettings();
+
+            InitializeAppClosingPreferencesSettings();
         }
 
         private static void InitializeStatusBarSettings()
@@ -566,6 +580,18 @@
             else
             {
                 _alwaysOpenNewWindow = false;
+            }
+        }
+
+        private static void InitializeAppClosingPreferencesSettings()
+        {
+            if (ApplicationSettingsStore.Read(SettingsKey.ExitingLastTabClosesWindowBool) is bool exitingLastTabClosesWindow)
+            {
+                _exitingLastTabClosesWindow = exitingLastTabClosesWindow;
+            }
+            else
+            {
+                _exitingLastTabClosesWindow = false;
             }
         }
     }
