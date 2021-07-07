@@ -66,6 +66,7 @@
             InitializeComponent();
 
             Suspending += OnSuspending;
+            LeavingBackground += OnLeavingBackground;
         }
 
         /// <summary>
@@ -108,7 +109,6 @@
             {
                 { "OSArchitecture", SystemInformation.OperatingSystemArchitecture.ToString() },
                 { "OSVersion", $"{SystemInformation.OperatingSystemVersion.Major}.{SystemInformation.OperatingSystemVersion.Minor}.{SystemInformation.OperatingSystemVersion.Build}" },
-                { "UseWindowsTheme", ThemeSettingsService.UseWindowsTheme.ToString() },
                 { "ThemeMode", ThemeSettingsService.ThemeMode.ToString() },
                 { "UseWindowsAccentColor", ThemeSettingsService.UseWindowsAccentColor.ToString() },
                 { "AppBackgroundTintOpacity", $"{(int) (ThemeSettingsService.AppBackgroundPanelTintOpacity * 10.0) * 10}" },
@@ -218,6 +218,18 @@
             }
 
             deferral.Complete();
+        }
+
+        /// <summary>
+        /// Occurs when the app moves to foreground from background.
+        /// Pending changes to the UI is made before app comes to focus.
+        /// </summary>
+        /// <param name="sender">The source of the leaving background request.</param>
+        /// <param name="e">Details about the leaving background request.</param>
+        private void OnLeavingBackground(object sender, LeavingBackgroundEventArgs e)
+        {
+            ThemeSettingsService.Initialize(true);
+            AppSettingsService.Initialize(true);
         }
 
         // Occurs when an exception is not handled on the UI thread.
